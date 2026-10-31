@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Меню — Шашлычная Барашек</title>
+<style>
+:root {
+   --bg-color: #EADCD2;
+   --bg-dark: #D4C4B6;
+   --text-main: #332211;
+   --text-muted: #665544;
+   --accent: #7C5030;
+   --accent-light: #A06B42;
+   --card-bg: #F4EAE3;
+   --border-color: rgba(124, 80, 48, 0.15);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+   background-color: var(--bg-color);
+   color: var(--text-main);
+   -webkit-font-smoothing: antialiased;
+   line-height: 1.5;
+}
+
+/* HERO */
+.hero {
+   min-height: 88vh;
+   display: flex;
+   flex-direction: column;
+   justify-content: center;
+   align-items: center;
+   text-align: center;
+   padding: 60px 20px 40px;
+   position: relative;
+   background: linear-gradient(180deg, var(--bg-color) 0%, var(--bg-dark) 100%);
+   overflow: hidden;
+}
+.hero::before {
+   content: '';
+   position: absolute;
+   inset: 0;
+   background: radial-gradient(circle at 50% 30%, rgba(124, 80, 48, 0.1) 0%, transparent 60%);
+   pointer-events: none;
+}
+.hero-content { position: relative; z-index: 2; }
+@keyframes heroIn {
+   from { opacity: 0; transform: translateY(30px); }
+   to { opacity: 1; transform: translateY(0); }
+}
+.hero-label {
+   font-size: 12px; letter-spacing: 6px; text-transform: uppercase;
+   color: var(--text-muted); margin-bottom: 24px;
+   opacity: 0; animation: heroIn 1s ease-out 0.2s forwards;
+}
+.hero h1 {
+   font-family: Georgia, 'Times New Roman', serif;
+   font-size: clamp(52px, 13vw, 100px);
+   font-weight: 400; letter-spacing: 10px; line-height: 1;
+   color: var(--text-main);
+   opacity: 0; animation: heroIn 1.2s ease-out 0.4s forwards;
+}
+.hero h1 .amp {
+   display: block; font-size: 13px; letter-spacing: 8px;
+   color: var(--accent); margin: 18px 0 0;
+   font-family: -apple-system, sans-serif; font-weight: 500;
+}
+.hero-sub {
+   font-size: 14px; color: var(--text-muted); letter-spacing: 4px;
+   text-transform: uppercase; margin-top: 24px;
+   opacity: 0; animation: heroIn 1s ease-out 0.7s forwards;
+}
+.hero-divider {
+   width: 60px; height: 1px; background: var(--accent);
+   margin: 34px auto 0;
+   opacity: 0; animation: heroIn 1s ease-out 0.9s forwards;
+}
+.scroll-hint {
+   position: absolute; bottom: 30px; left: 50%;
+   transform: translateX(-50%);
+   font-size: 10px; letter-spacing: 4px; text-transform: uppercase;
+   color: var(--text-muted); opacity: 0.6;
+   animation: bounce 2s ease-in-out infinite;
+}
+@keyframes bounce {
+   0%, 100% { transform: translateX(-50%) translateY(0); }
+   50% { transform: translateX(-50%) translateY(6px); }
+}
+
+/* NAV */
+.nav-scroll {
+   position: sticky; top: 0;
+   background: rgba(234, 220, 210, 0.92);
+   backdrop-filter: blur(15px);
+   -webkit-backdrop-filter: blur(15px);
+   z-index: 100; overflow-x: auto; white-space: nowrap;
+   padding: 12px 20px;
+   border-bottom: 1px solid var(--border-color);
+   scrollbar-width: none;
+   -webkit-overflow-scrolling: touch;
+}
+.nav-scroll::-webkit-scrollbar { display: none; }
+.nav-scroll a {
+   display: inline-block; text-decoration: none;
+   color: var(--text-muted); font-weight: 500; font-size: 13px;
+   letter-spacing: 1px; padding: 8px 14px; margin-right: 4px;
+   border-radius: 20px; transition: all 0.25s ease;
+}
+.nav-scroll a:hover { color: var(--accent); background: rgba(124, 80, 48, 0.08); }
+.nav-scroll a.active { background: var(--accent); color: #fff; }
+
+/* SEARCH */
+.search-wrap { max-width: 640px; margin: 30px auto 0; padding: 0 20px; }
+.search-input {
+   width: 100%; padding: 16px 24px; border-radius: 40px;
+   border: 1px solid var(--border-color);
+   background: var(--card-bg); font-size: 15px; color: var(--text-main);
+   outline: none; transition: all 0.3s; font-family: inherit;
+}
+.search-input:focus { border-color: var(--accent); box-shadow: 0 8px 24px rgba(124, 80, 48, 0.12); }
+.search-input::placeholder { color: var(--text-muted); opacity: 0.7; }
+
+.empty-state {
+   text-align: center; padding: 60px 20px;
+   color: var(--text-muted); font-size: 15px; display: none;
+}
+.empty-state.visible { display: block; }
+.empty-state .big { font-size: 40px; margin-bottom: 15px; opacity: 0.4; }
+
+/* MENU */
+.menu-container { padding: 40px 20px 80px; max-width: 720px; margin: 0 auto; }
+
+.category-title {
+   font-family: Georgia, 'Times New Roman', serif;
+   font-size: clamp(26px, 5vw, 36px); font-weight: 400;
+   color: var(--text-main); margin: 60px 0 8px;
+   padding-bottom: 12px; position: relative;
+   scroll-margin-top: 80px; letter-spacing: 1px;
+}
+.category-title::after {
+   content: ''; position: absolute; bottom: 0; left: 0;
+   width: 50px; height: 2px; background: var(--accent);
+}
+.category-title:first-child { margin-top: 20px; }
+.category-subtitle {
+   font-size: 12px; color: var(--text-muted);
+   margin: 30px 0 15px; letter-spacing: 3px;
+   text-transform: uppercase; font-weight: 500;
+}
+
+.menu-item {
+   background: var(--card-bg); border-radius: 14px;
+   margin-bottom: 10px; padding: 18px 20px;
+   display: flex; align-items: center; justify-content: space-between;
+   gap: 20px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+   border: 1px solid transparent; position: relative; overflow: hidden;
+}
+.menu-item::before {
+   content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+   width: 3px; background: var(--accent);
+   transform: scaleY(0); transform-origin: top;
+   transition: transform 0.3s ease;
+}
+.menu-item:hover {
+   background: #fff; transform: translateX(4px);
+   box-shadow: 0 8px 24px rgba(124, 80, 48, 0.08);
+   border-color: var(--border-color);
+}
+.menu-item:hover::before { transform: scaleY(1); }
+.menu-item.reveal { opacity: 0; transform: translateY(20px); }
+.menu-item.reveal.revealed {
+   opacity: 1; transform: translateY(0);
+   transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.menu-item.reveal.revealed:hover { transform: translateX(4px); }
+
+.item-info { flex: 1; min-width: 0; }
+.item-name {
+   font-size: 16px; font-weight: 600; line-height: 1.35;
+   color: var(--text-main); display: block;
+}
+.item-weight {
+   font-size: 12px; color: var(--text-muted);
+   font-weight: 400; margin-left: 6px; opacity: 0.75;
+}
+.item-desc {
+   font-size: 13px; color: var(--text-muted);
+   margin-top: 8px; line-height: 1.5;
+}
+.item-price {
+   font-family: Georgia, serif;
+   font-size: 16px; font-weight: 700; color: var(--accent);
+   white-space: nowrap; padding: 6px 14px;
+   background: rgba(124, 80, 48, 0.08);
+   border-radius: 20px; flex-shrink: 0;
+}
+
+/* FOOTER */
+footer {
+   text-align: center; padding: 60px 20px 40px;
+   background: var(--text-main); color: var(--bg-color);
+}
+footer .foot-logo {
+   font-family: Georgia, serif; font-size: 26px;
+   letter-spacing: 8px; margin-bottom: 8px;
+}
+footer .foot-sub {
+   font-size: 11px; letter-spacing: 5px;
+   opacity: 0.6; margin-bottom: 25px;
+}
+footer .foot-info { font-size: 13px; opacity: 0.8; line-height: 1.8; }
+
+.hidden { display: none !important; }
+
+@media (max-width: 480px) {
+   .menu-item { padding: 16px; gap: 12px; }
+   .item-name { font-size: 15px; }
+   .item-price { font-size: 15px; padding: 5px 11px; }
+   .category-title { margin-top: 45px; }
+   .hero { min-height: 80vh; }
+}
+</style>
+</head>
+<body>
+
+<section class="hero">
+   <div class="hero-content">
+       <div class="hero-label">Шашлычная</div>
+       <h1>БАРАШЕК<span class="amp">— на углях —</span></h1>
+       <div class="hero-sub">Меню ресторана</div>
+       <div class="hero-divider"></div>
+   </div>
+   <div class="scroll-hint">Листайте ↓</div>
+</section>
+
+<nav class="nav-scroll" id="mainNav">
+   <a href="#mangal">Мангал</a>
+   <a href="#pech">Из печи</a>
+   <a href="#zakuski">Закуски</a>
+   <a href="#supy">Супы</a>
+   <a href="#goryachee">Горячее</a>
+   <a href="#garniry">Гарниры</a>
+   <a href="#sousy">Соусы</a>
+   <a href="#deserty">Десерты</a>
+   <a href="#tea_coffee">Чай и кофе</a>
+   <a href="#lemonades">Лимонады</a>
+   <a href="#alcohol">Алкоголь</a>
+   <a href="#wine">Вино</a>
+   <a href="#cocktails">Коктейли</a>
+</nav>
+
+<div class="search-wrap">
+   <input type="text" id="searchInput" class="search-input" placeholder="Поиск по меню (например, хачапури)...">
+</div>
+
+<main class="menu-container" id="menuList">
+<div class="empty-state" id="emptyState">
+   <div class="big">🍽</div>
+   <div>Ничего не найдено</div>
+   <div style="font-size:12px; margin-top:8px; opacity:0.7;">Попробуйте другое слово</div>
+</div>
+
+<!-- МАНГАЛ -->
+<h2 class="category-title" id="mangal">Мангал</h2>
+<div class="menu-item"><div class="item-info"><span class="item-name">Каре ягнёнка<span class="item-weight">100 гр.</span></span></div><div class="item-price">620 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Барани семечки</span></div><div class="item-price">980 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Шашлык из бараней печени</span></div><div class="item-price">670 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Шашлык из телятины<span class="item-weight">100 гр.</span></span></div><div class="item-price">790 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Шашлык из свиной шеи</span></div><div class="item-price">760 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Свиные рёбра на углях</span></div><div class="item-price">860 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Шашлык из индейки</span></div><div class="item-price">720 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Шашлык из курицы</span></div><div class="item-price">650 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Перепёлка на углях</span></div><div class="item-price">790 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Люля-Кебаб из баранины</span></div><div class="item-price">1030 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Люля-Кебаб из курицы / с сыром</span></div><div class="item-price">560 / 590 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Люля-Кебаб из телятины / с сыром</span></div><div class="item-price">690 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Люля-Кебаб из сёмги</span></div><div class="item-price">990 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Шашлык из сёмги<span class="item-weight">100 гр.</span></span></div><div class="item-price">810 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Дорадо на углях</span></div><div class="item-price">1450 ₽</div></div>
+
+<!-- ИЗ ПЕЧИ -->
+<h2 class="category-title" id="pech">Блюда из печи</h2>
+<div class="menu-item"><div class="item-info"><span class="item-name">Кутаб с сыром</span></div><div class="item-price">320 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Кутаб с бараниной</span></div><div class="item-price">530 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Кутаб с зеленью</span></div><div class="item-price">320 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Хачапури по-аджарски</span></div><div class="item-price">620 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Хачапури по-мегрельски</span></div><div class="item-price">650 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Хачапури с грушей и горгонзолой</span></div><div class="item-price">920 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Хачапури с креветками</span></div><div class="item-price">960 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Хачапури кубдари</span></div><div class="item-price">770 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Хачапури на мангале</span></div><div class="item-price">380 ₽</div></div>
+
+<!-- ЗАКУСКИ -->
+<h2 class="category-title" id="zakuski">Закуски / Салаты</h2>
+<div class="menu-item"><div class="item-info"><span class="item-name">Ассорти из свежей зелени, томатов и огурцов</span></div><div class="item-price">720 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Сырная тарелка</span></div><div class="item-price">860 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Домашние соленья</span></div><div class="item-price">750 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Бастурма</span></div><div class="item-price">560 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Костный мозг на бородинском хлебе</span></div><div class="item-price">590 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Рулетики из баклажан с сырной начинкой</span></div><div class="item-price">540 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Рулетики из баклажан с ореховой начинкой</span></div><div class="item-price">430 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Аджапсандал</span></div><div class="item-price">540 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Жареный сулугуни с ягодным соусом</span></div><div class="item-price">420 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Салат овощной по-грузински</span></div><div class="item-price">580 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Салат со шпинатом, ростками маша и соусом из кинзы</span></div><div class="item-price">560 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Салат с хрустящим баклажаном и мягким сыром</span></div><div class="item-price">590 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Овощной салат с адыгейским сыром</span></div><div class="item-price">590 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Салат с морепродуктами и заправкой из ревеня</span></div><div class="item-price">840 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Теплый салат с телятиной и заправкой из эстрагона</span></div><div class="item-price">760 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Салат с сёмгой и авокадо</span></div><div class="item-price">760 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Салат с креветкой и рукколой</span></div><div class="item-price">750 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Томаты, сулугуни и соус из базилика</span></div><div class="item-price">690 ₽</div></div>
+
+<!-- СУПЫ -->
+<h2 class="category-title" id="supy">Супы</h2>
+<div class="menu-item"><div class="item-info"><span class="item-name">Лагман с бараниной</span></div><div class="item-price">680 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Шурпа</span></div><div class="item-price">590 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Харчо</span></div><div class="item-price">480 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Борщ</span></div><div class="item-price">710 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Чихиртма</span></div><div class="item-price">470 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Сливочный рыбный суп с эстрагоном</span></div><div class="item-price">690 ₽</div></div>
+
+<!-- ГОРЯЧЕЕ -->
+<h2 class="category-title" id="goryachee">Горячие блюда</h2>
+<div class="menu-item"><div class="item-info"><span class="item-name">Плов из баранины</span></div><div class="item-price">970 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Половинка цыплёнка с пюре и перцем халапеньо</span></div><div class="item-price">1100 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Долма с чесночным мацони</span></div><div class="item-price">690 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Кучмачи из бараньей печени</span></div><div class="item-price">430 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Сациви с курицей</span></div><div class="item-price">480 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Лобио</span></div><div class="item-price">360 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Сердца утиные с белыми грибами и грушей</span></div><div class="item-price">770 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Креветки по-чкмерски</span></div><div class="item-price">870 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Языки ягнёнка с морковным пюре, кумином и копчёным соусом</span></div><div class="item-price">820 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Куриное бедро с гречневой кашей и вешенкой</span></div><div class="item-price">840 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Форель с пряной чечевицей</span></div><div class="item-price">890 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Баранина с овощами</span></div><div class="item-price">980 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Лопатка ягнёнка с картофелем</span></div><div class="item-price">4200 ₽</div></div>
+
+<!-- ГАРНИРЫ -->
+<h2 class="category-title" id="garniry">Гарниры</h2>
+<div class="menu-item"><div class="item-info"><span class="item-name">Картофель на углях с грибами</span></div><div class="item-price">320 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Картофель на углях с зеленью</span></div><div class="item-price">220 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Картофель на углях с сыром</span></div><div class="item-price">260 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Картофель беби с курдюком</span></div><div class="item-price">300 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Овощи на углях</span></div><div class="item-price">540 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Шампиньоны на углях</span></div><div class="item-price">340 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Кукуруза на мангале</span></div><div class="item-price">370 ₽</div></div>
+
+<h2 class="category-title" id="sousy">Соусы</h2>
+<div class="menu-item"><div class="item-info"><span class="item-name">Сацибели</span></div><div class="item-price">80 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Ткемали</span></div><div class="item-price">100 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Мацони</span></div><div class="item-price">80 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Аджика</span></div><div class="item-price">90 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Томатная сальса</span></div><div class="item-price">100 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Наршараб</span></div><div class="item-price">150 ₽</div></div>
+
+<!-- ДЕСЕРТЫ -->
+<h2 class="category-title" id="deserty">Десерты</h2>
+<div class="menu-item"><div class="item-info"><span class="item-name">Пирог малиновый</span></div><div class="item-price">490 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Штрудель вишнёвый</span></div><div class="item-price">590 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Наполеон</span></div><div class="item-price">640 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Медовик</span></div><div class="item-price">460 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Пахлава</span></div><div class="item-price">510 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Меренговый рулет</span></div><div class="item-price">490 ₽</div></div>
+
+<!-- ЧАЙ И КОФЕ -->
+<h2 class="category-title" id="tea_coffee">Чай, Кофе и Горячие напитки</h2>
+<h3 class="category-subtitle">Фирменный чай (800 мл)</h3>
+<div class="menu-item"><div class="item-info"><span class="item-name">Форест чай с сосновыми шишками</span></div><div class="item-price">610 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Облепиховый чай с розмарином</span></div><div class="item-price">600 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Малиновый с имбирём</span></div><div class="item-price">610 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Брусника с чабрецом</span></div><div class="item-price">600 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Черешня-каркаде</span></div><div class="item-price">610 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Киндзмараульский бархат</span></div><div class="item-price">610 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Горный нектар</span></div><div class="item-price">610 ₽</div></div>
+
+<h3 class="category-subtitle">Чай (800 мл)</h3>
+<div class="menu-item"><div class="item-info"><span class="item-name">Китайский Сенча</span></div><div class="item-price">440 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Зелёный с жасмином</span></div><div class="item-price">440 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Таёжный сбор зелёный</span></div><div class="item-price">440 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Зелёный чай с чабрецом</span></div><div class="item-price">440 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Молочный Улун</span></div><div class="item-price">440 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Виноградный Улун</span></div><div class="item-price">440 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Те Гуань инь</span></div><div class="item-price">440 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Благородный Ассам</span></div><div class="item-price">440 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Чёрный чай с чабрецом</span></div><div class="item-price">440 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Таёжный сбор чёрный</span></div><div class="item-price">440 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Фруктовый сад</span></div><div class="item-price">440 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Травяной сбор кавказских трав</span></div><div class="item-price">440 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Липовый</span></div><div class="item-price">440 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Чабрец</span></div><div class="item-price">440 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Шу-Пуэр</span></div><div class="item-price">440 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Габа</span></div><div class="item-price">440 ₽</div></div>
+
+<h3 class="category-subtitle">Кофе</h3>
+<div class="menu-item"><div class="item-info"><span class="item-name">Эспрессо</span></div><div class="item-price">230 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Доппио</span></div><div class="item-price">340 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Американо</span></div><div class="item-price">230 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Лунго</span></div><div class="item-price">230 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Капучино</span></div><div class="item-price">290 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Двойной капучино</span></div><div class="item-price">380 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Латте</span></div><div class="item-price">320 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Флэт Уайт</span></div><div class="item-price">350 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Капучино на растительном молоке (кокосовое, миндальное, банановое)</span></div><div class="item-price">360 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Сливочный раф</span></div><div class="item-price">360 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Сырный раф</span></div><div class="item-price">420 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Какао с маршмеллоу</span></div><div class="item-price">480 ₽</div></div>
+
+<h3 class="category-subtitle">Кофе в джезве (60 мл)</h3>
+<div class="menu-item"><div class="item-info"><span class="item-name">Бразилия</span></div><div class="item-price">300 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Кофе со сгущённым молоком</span></div><div class="item-price">310 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Кофе с кардамоном</span></div><div class="item-price">300 ₽</div></div>
+
+<h3 class="category-subtitle">Горячие напитки</h3>
+<div class="menu-item"><div class="item-info"><span class="item-name">Облепиховый сбитень</span></div><div class="item-price">495 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Согревающий сбитень</span></div><div class="item-price">650 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Глинтвейн</span></div><div class="item-price">650 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Горячий апероль</span></div><div class="item-price">590 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Яблочный грог</span></div><div class="item-price">590 ₽</div></div>
+
+<!-- ЛИМОНАДЫ -->
+<h2 class="category-title" id="lemonades">Лимонады, Соки, Морсы</h2>
+<h3 class="category-subtitle">Лимонады (350 мл)</h3>
+<div class="menu-item"><div class="item-info"><span class="item-name">Щавелевый лимонад</span></div><div class="item-price">450 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Лайм-Лемонграсс</span></div><div class="item-price">440 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Ананас-базилик</span></div><div class="item-price">450 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Мохито б/алк.</span></div><div class="item-price">440 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Мохито б/алк. Клубничный</span></div><div class="item-price">450 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Классический</span></div><div class="item-price">440 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Киви-огурец</span></div><div class="item-price">450 ₽</div></div>
+
+<h3 class="category-subtitle">Лимонады на компанию (1000 мл)</h3>
+<div class="menu-item"><div class="item-info"><span class="item-name">Лайм-Лемонграсс</span></div><div class="item-price">800 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Ананас-базилик</span></div><div class="item-price">820 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Щавелевый лимонад</span></div><div class="item-price">830 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Классический</span></div><div class="item-price">810 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Киви-огурец</span></div><div class="item-price">820 ₽</div></div>
+
+<h3 class="category-subtitle">Свежевыжатый сок (250 мл)</h3>
+<div class="menu-item"><div class="item-info"><span class="item-name">Яблочный</span></div><div class="item-price">480 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Морковный</span></div><div class="item-price">480 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Апельсиновый</span></div><div class="item-price">490 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Грейпфрутовый</span></div><div class="item-price">490 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Сельдереевый</span></div><div class="item-price">480 ₽</div></div>
+
+<h3 class="category-subtitle">Морсы/Соки (250 мл)</h3>
+<div class="menu-item"><div class="item-info"><span class="item-name">Ягодный морс</span></div><div class="item-price">230 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Компот из чёрной смородины</span></div><div class="item-price">230 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Узвар из сухофруктов</span></div><div class="item-price">230 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Соки и нектары (апельсин, яблоко, ананас, томат, вишня)</span></div><div class="item-price">230 ₽</div></div>
+
+<h3 class="category-subtitle">Милкшейки (300 мл)</h3>
+<div class="menu-item"><div class="item-info"><span class="item-name">Банановая Nutella</span></div><div class="item-price">550 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Клубничный рай</span></div><div class="item-price">530 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Классический</span></div><div class="item-price">510 ₽</div></div>
+
+<h3 class="category-subtitle">Напитки (бутылки)</h3>
+<div class="menu-item"><div class="item-info"><span class="item-name">Вода Джигем<span class="item-weight">0,5 л</span></span></div><div class="item-price">250 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Боржоми<span class="item-weight">0,5 л</span></span></div><div class="item-price">390 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Намахмари<span class="item-weight">0,5 л</span></span></div><div class="item-price">320 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Coca-Cola<span class="item-weight">0,33 л</span></span></div><div class="item-price">350 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Эвервест тоник<span class="item-weight">0,33 л</span></span></div><div class="item-price">330 ₽</div></div>
+
+<!-- АЛКОГОЛЬ -->
+<h2 class="category-title" id="alcohol">Крепкий алкоголь</h2>
+<h3 class="category-subtitle">Домашние настойки (50 мл)</h3>
+<div class="menu-item"><div class="item-info"><span class="item-name">Дегустационный набор 6 настоек</span></div><div class="item-price">1590 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Лимончелло / Смородина / Перцовка / Облепиха / Малина-лемонграсс / Сезонная / Бородинская хреновуха / Чёрный чеснок / Укроповка / Фейхоа-грейпфрут / Черешня-корица</span></div><div class="item-price">290 ₽</div></div>
+
+<h3 class="category-subtitle">Дистилляты (50 мл)</h3>
+<div class="menu-item"><div class="item-info"><span class="item-name">Самовар Ржаной 38,5°</span></div><div class="item-price">350 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Самовар Яблочный 42°</span></div><div class="item-price">400 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Морус Персик 44°</span></div><div class="item-price">600 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Морус Дикая Груша 42°</span></div><div class="item-price">600 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Морус Хурма 44°</span></div><div class="item-price">600 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Морус Абрикос 50°</span></div><div class="item-price">700 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Чача Асканели Платинум 40°</span></div><div class="item-price">450 ₽</div></div>
+
+<h3 class="category-subtitle">Виски (50 мл)</h3>
+<div class="menu-item"><div class="item-info"><span class="item-name">Auchentoshan 12 Years Old</span></div><div class="item-price">950 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Laphroaig 10 Years Old</span></div><div class="item-price">1500 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Glenmorangie The Quinta Ruban 14 Years Old</span></div><div class="item-price">1600 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Macallan Double Cask 12 Years Old</span></div><div class="item-price">2000 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Dewar's White Label</span></div><div class="item-price">600 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Dewar's 8 Years Old French Smooth</span></div><div class="item-price">700 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Chivas Regal 12 Years Old</span></div><div class="item-price">700 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Chivas Regal 18 Years Old</span></div><div class="item-price">1500 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Jameson</span></div><div class="item-price">600 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Bushmills Black Bush</span></div><div class="item-price">800 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Bushmills Single Malt 10 Years Old</span></div><div class="item-price">1200 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Jim Beam</span></div><div class="item-price">500 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Jack Daniels</span></div><div class="item-price">700 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Maker's Mark</span></div><div class="item-price">900 ₽</div></div>
+
+<h3 class="category-subtitle">Джин, Текила, Водка, Вермут (50 мл)</h3>
+<div class="menu-item"><div class="item-info"><span class="item-name">Bosford</span></div><div class="item-price">450 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Brass Monkey Modern Dry</span></div><div class="item-price">500 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Bombay Sapphire</span></div><div class="item-price">650 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Olmeca Silver</span></div><div class="item-price">550 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Jose Cuervo Especial Reposado</span></div><div class="item-price">550 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Espolon Blanco</span></div><div class="item-price">850 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Балчуг XXI век</span></div><div class="item-price">250 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Арктика</span></div><div class="item-price">350 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Мамонт</span></div><div class="item-price">450 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Онегин</span></div><div class="item-price">500 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Чистые росы</span></div><div class="item-price">600 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Grey Goose</span></div><div class="item-price">700 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Martini (Bianco, Extra dry, Fiero, Rosso)<span class="item-weight">100 мл</span></span></div><div class="item-price">750 ₽</div></div>
+
+<h3 class="category-subtitle">Ликеры Биттеры (50 мл)</h3>
+<div class="menu-item"><div class="item-info"><span class="item-name">Aperol</span></div><div class="item-price">400 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Baileys, Original</span></div><div class="item-price">450 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Becherovka</span></div><div class="item-price">450 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Jagermeister</span></div><div class="item-price">450 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Морус Абрикосовый Ликёр</span></div><div class="item-price">500 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Sarti Rosa</span></div><div class="item-price">550 ₽</div></div>
+
+<h3 class="category-subtitle">Кальвадос, Коньяк (50 мл)</h3>
+<div class="menu-item"><div class="item-info"><span class="item-name">Pere Magloire, VSOP</span></div><div class="item-price">1200 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Monnet VS</span></div><div class="item-price">900 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Courvoisier VS</span></div><div class="item-price">1200 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Courvoisier VSOP</span></div><div class="item-price">1700 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Roullet Cadet XO</span></div><div class="item-price">2000 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Арарат 5 лет</span></div><div class="item-price">500 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Арарат Абрикос</span></div><div class="item-price">600 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Коктебель КС 11 лет</span></div><div class="item-price">650 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Ной Классик 7 лет</span></div><div class="item-price">750 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Багратион ОС 20 лет</span></div><div class="item-price">1600 ₽</div></div>
+
+<!-- ВИНО -->
+<h2 class="category-title" id="wine">Винная карта</h2>
+<p class="category-subtitle" style="text-transform:none;letter-spacing:0;font-style:italic;">Цены указаны за бутылку или за бокал (если указано через дробь)</p>
+
+<h3 class="category-subtitle">Sparkling (Игристые)</h3>
+<div class="menu-item"><div class="item-info"><span class="item-name">Балаклава, Шардоне брют</span></div><div class="item-price">2500 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Балаклава, Пино Нуар брют</span></div><div class="item-price">2500 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Балаклава, Мускат полусладкое</span></div><div class="item-price">2500 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Кюве де Витмер, Золотая Балка, Брют</span></div><div class="item-price">4400 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Bruni Asti, сладкое</span></div><div class="item-price">3000 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Prosecco Brut, Bruni</span></div><div class="item-price">780 / 3900 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Cuis Premier Cru Blanc de Blancs Brut, Pierre Gimonnet & Fils</span></div><div class="item-price">17200 ₽</div></div>
+
+<h3 class="category-subtitle">White (Белые)</h3>
+<div class="menu-item"><div class="item-info"><span class="item-name">Dragon Bay Albarino, сухое</span></div><div class="item-price">2850 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Simonsig Sauvignon Blanc / Semillon, сухое</span></div><div class="item-price">650 / 3900 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Hans Baer Riesling, полусухое</span></div><div class="item-price">650 / 3900 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Hans Baer Gewurztraminer, полусладкое</span></div><div class="item-price">715 / 4300 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Pfefferer, полусухое</span></div><div class="item-price">4800 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Pinot Bianco, Cantina Terlan, сухое</span></div><div class="item-price">10900 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Luigi Bosca Chardonnay, сухое</span></div><div class="item-price">4950 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Рислинг, Сикоры, сухое</span></div><div class="item-price">4600 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Петрикер Мальвазия, Шумринка, сухое</span></div><div class="item-price">5500 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Paddle Creek Sauvignon Blanc, Lake Road, полусухое</span></div><div class="item-price">750 / 4500 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Coteaux Bourguignons Blanc, Domaines Dominique Piron, сухое</span></div><div class="item-price">8250 ₽</div></div>
+
+<h3 class="category-subtitle">Red (Красные)</h3>
+<div class="menu-item"><div class="item-info"><span class="item-name">Семисам Шумринка, сухое</span></div><div class="item-price">2900 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Гериз, Сикоры, сухое</span></div><div class="item-price">4200 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Фестмелия, Николаев и Сыновья, сухое</span></div><div class="item-price">4400 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Gathering Storm, полусухое</span></div><div class="item-price">650 / 3900 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">El Picaro, Matsu, сухое</span></div><div class="item-price">4150 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Chianti, Conti Serristor, сухое</span></div><div class="item-price">3900 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Simonsig Cabernet Sauvignon / Shiraz, сухое</span></div><div class="item-price">650 / 3900 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Simonsig Pinotage, сухое</span></div><div class="item-price">4800 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Cape Original Pinotage, сухое</span></div><div class="item-price">3200 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Carolina Reserva Carmenere, Santa Carolina, сухое</span></div><div class="item-price">625 / 3750 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Carolina Reserva Cabernet Sauvignon, Santa Carolina, сухое</span></div><div class="item-price">3750 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Carolina Reserva Pinot Noir, Santa Carolina, сухое</span></div><div class="item-price">3750 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Kindzmarauli Kvareti, полусладкое</span></div><div class="item-price">2800 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Kindzmarauli Binehki, полусладкое</span></div><div class="item-price">820 / 4900 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Saperavi, Binehki, сухое</span></div><div class="item-price">780 / 4700 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Luigi Bosca Cabernet Sauvignon, сухое</span></div><div class="item-price">5350 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">De sangra Malbec, Luigi Bosca, сухое</span></div><div class="item-price">9400 ₽</div></div>
+
+<h3 class="category-subtitle">Rose / Orange / Другое</h3>
+<div class="menu-item"><div class="item-info"><span class="item-name">Каберне Фран Розе, Сикоры, сухое</span></div><div class="item-price">3900 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Локо Чимбали Оранж, Локо Чимбали, сухое</span></div><div class="item-price">750 / 4500 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Гранатовое вино</span></div><div class="item-price">550 / 3300 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Tres Arcos Ruby Port<span class="item-weight">75 мл</span></span></div><div class="item-price">540 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Tres Arcos Tawny Porto<span class="item-weight">75 мл</span></span></div><div class="item-price">540 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Le Grand Noir Grenache Blanc-Chardonnay, 0,0% (б/алк)</span></div><div class="item-price">650 / 3900 ₽</div></div>
+
+<h3 class="category-subtitle">Выбор без выбора</h3>
+<div class="menu-item"><div class="item-info"><span class="item-name">Вино с минимальной наценкой (белое или красное на выбор)</span><div class="item-desc">Вина из этой категории предлагаются с минимальной наценкой. Вы выбираете только цвет — белое или красное. Конкретную позицию подбирает официант из доступного ассортимента. Вина меняются и доступны в ограниченном количестве.</div></div><div class="item-price">1900 ₽</div></div>
+
+<!-- КОКТЕЙЛИ -->
+<h2 class="category-title" id="cocktails">Коктейли и Пиво</h2>
+<h3 class="category-subtitle">Официальная классика</h3>
+<div class="menu-item"><div class="item-info"><span class="item-name">Олд Фэшн</span></div><div class="item-price">720 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Gin Basil Smash</span></div><div class="item-price">710 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Негрони</span></div><div class="item-price">720 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Daiquiri</span></div><div class="item-price">720 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Апероль Сприц</span></div><div class="item-price">720 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Фиеро-Тоник</span></div><div class="item-price">720 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Long Island Iced Tea</span></div><div class="item-price">720 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Gin and Tonic</span></div><div class="item-price">710 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Margarita</span></div><div class="item-price">740 ₽</div></div>
+
+<h3 class="category-subtitle">Авторские коктейли</h3>
+<div class="menu-item"><div class="item-info"><span class="item-name">Cherry sour</span></div><div class="item-price">710 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Барбарисовый хайбол</span></div><div class="item-price">720 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Английский лес</span></div><div class="item-price">720 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Черёмуха-васильки</span></div><div class="item-price">720 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Aztec</span></div><div class="item-price">720 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Берёзовый хайбол</span></div><div class="item-price">720 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Махунцети</span></div><div class="item-price">720 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Lemon pie</span></div><div class="item-price">710 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Island Apricot</span></div><div class="item-price">720 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Aperol non alcohol</span></div><div class="item-price">510 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Черёмуха-васильки б/алк</span></div><div class="item-price">540 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Paloma</span></div><div class="item-price">720 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Демерара</span></div><div class="item-price">720 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Limoncello Spritz</span></div><div class="item-price">720 ₽</div></div>
+
+<h3 class="category-subtitle">Пиво и сидр на кране (330/500 мл)</h3>
+<div class="menu-item"><div class="item-info"><span class="item-name">Сидр Барашек</span></div><div class="item-price">390 / 490 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Pan Baran</span></div><div class="item-price">410 / 550 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Hopfen Krone</span></div><div class="item-price">410 / 550 ₽</div></div>
+
+<h3 class="category-subtitle">Пиво (бутылки)</h3>
+<div class="menu-item"><div class="item-info"><span class="item-name">Clausthaler б/алк<span class="item-weight">330 мл</span></span></div><div class="item-price">390 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">«Cernovar» Cerne<span class="item-weight">500 мл</span></span></div><div class="item-price">690 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Spaten<span class="item-weight">500 мл</span></span></div><div class="item-price">680 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Liebenweiss Hefe-Weissbier<span class="item-weight">500 мл</span></span></div><div class="item-price">720 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Ayinger Bairisch Pils<span class="item-weight">500 мл</span></span></div><div class="item-price">910 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Arcobräu<span class="item-weight">500 мл</span></span></div><div class="item-price">680 ₽</div></div>
+
+<h3 class="category-subtitle">Сидр (бутылки)</h3>
+<div class="menu-item"><div class="item-info"><span class="item-name">Nympho Alkohol Free<span class="item-weight">330 мл</span></span></div><div class="item-price">490 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Сидр Дыня-Маракуйя<span class="item-weight">500 мл</span></span></div><div class="item-price">490 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Сидр Дача в ассортименте<span class="item-weight">500 мл</span></span></div><div class="item-price">590 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Сидр вишня-миндаль<span class="item-weight">500 мл</span></span></div><div class="item-price">490 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Barkaiztegi Gorenak Natural<span class="item-weight">750 мл</span></span></div><div class="item-price">1750 ₽</div></div>
+<div class="menu-item"><div class="item-info"><span class="item-name">Bellot Brut<span class="item-weight">750 мл</span></span></div><div class="item-price">1750 ₽</div></div>
+
+</main>
+
+<footer>
+   <div class="foot-logo">БАРАШЕК</div>
+   <div class="foot-sub">ШАШЛЫЧНАЯ</div>
+   <div class="foot-info">Приятного аппетита!</div>
+</footer>
+
+<script>
+const searchInput = document.getElementById('searchInput');
+const emptyState = document.getElementById('emptyState');
+
+searchInput.addEventListener('input', function(e) {
+   const searchText = e.target.value.toLowerCase().trim();
+   const items = document.querySelectorAll('.menu-item');
+   const categories = document.querySelectorAll('.category-title');
+   const subtitles = document.querySelectorAll('.category-subtitle');
+   let anyVisible = false;
+
+   items.forEach(item => {
+       item.classList.remove('hidden');
+       if (searchText.length > 0) {
+           const text = item.innerText.toLowerCase();
+           if (!text.includes(searchText)) item.classList.add('hidden');
+           else anyVisible = true;
+       }
+   });
+
+   if (searchText.length > 0) {
+       categories.forEach(cat => {
+           let nextEl = cat.nextElementSibling;
+           let hasVisible = false;
+           while (nextEl && !nextEl.classList.contains('category-title')) {
+               if (nextEl.classList.contains('menu-item') && !nextEl.classList.contains('hidden')) { hasVisible = true; break; }
+               nextEl = nextEl.nextElementSibling;
+           }
+           if (!hasVisible) cat.classList.add('hidden');
+       });
+       subtitles.forEach(sub => {
+           let nextEl = sub.nextElementSibling;
+           let hasVisible = false;
+           while (nextEl && !nextEl.classList.contains('category-subtitle') && !nextEl.classList.contains('category-title')) {
+               if (nextEl.classList.contains('menu-item') && !nextEl.classList.contains('hidden')) { hasVisible = true; break; }
+               nextEl = nextEl.nextElementSibling;
+           }
+           if (!hasVisible) sub.classList.add('hidden');
+       });
+   }
+
+   emptyState.classList.toggle('visible', searchText.length > 0 && !anyVisible);
+});
+
+// Scroll reveal
+const revealObserver = new IntersectionObserver((entries) => {
+   entries.forEach(entry => {
+       if (entry.isIntersecting) {
+           entry.target.classList.add('revealed');
+           revealObserver.unobserve(entry.target);
+       }
+   });
+}, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.menu-item').forEach(el => {
+   el.classList.add('reveal');
+   revealObserver.observe(el);
+});
+
+// Active nav
+const navLinks = document.querySelectorAll('#mainNav a');
+const categoryTitles = document.querySelectorAll('.category-title');
+
+const navObserver = new IntersectionObserver((entries) => {
+   entries.forEach(entry => {
+       if (entry.isIntersecting) {
+           const id = entry.target.id;
+           navLinks.forEach(link => {
+               const isActive = link.getAttribute('href') === '#' + id;
+               link.classList.toggle('active', isActive);
+               if (isActive) {
+                   link.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+               }
+           });
+       }
+   });
+}, { threshold: 0, rootMargin: '-80px 0px -70% 0px' });
+
+categoryTitles.forEach(title => navObserver.observe(title));
+</script>
+</body>
+</html>
